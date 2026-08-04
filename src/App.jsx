@@ -74,20 +74,56 @@ export default function App() {
     setModal(null);
   };
 
+  const handleExport = async () => {
+    try {
+      const payload = {
+        exported_at: new Date().toISOString(),
+        today: data.today,
+        prayer: todayRow && { fajr: todayRow.fajr, dhuhr: todayRow.dhuhr, asr: todayRow.asr, maghrib: todayRow.maghrib, isha: todayRow.isha },
+        sleep: todayRow && { wake_time: todayRow.wake_time, sleep_time: todayRow.sleep_time },
+        quran: todayRow && { quran_start: todayRow.quran_start, quran_end: todayRow.quran_end, total_pages: 603 },
+        gym: todayRow && { type: todayRow.gym_type, done: todayRow.gym_done },
+        books: data.books,
+        habits: data.habits,
+        tasks: todayTasks,
+      };
+      const json = JSON.stringify(payload, null, 2);
+      const prompt =
+        'Here is my Jusoor Daily productivity JSON export. Analyze my Quran pacing, sleep debt, ' +
+        'workout consistency and focus on the Jusoor project, and give me 3 brutal, actionable ' +
+        'adjustments for tomorrow:\n\n' +
+        json;
+      try {
+        await navigator.clipboard.writeText(prompt);
+      } catch (_) {
+        const ta = document.createElement('textarea');
+        ta.value = prompt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      return true;
+    } catch (e) {
+      console.error('export failed', e);
+      return false;
+    }
+  };
+
   return (
     <div className="flex h-screen bg-carbon-bg text-carbon-text font-sans overflow-hidden">
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-56' : 'w-16'} transition-all duration-200 bg-carbon-panel border-r border-carbon-border flex flex-col z-20 shrink-0`}>
-        <div className="h-16 flex items-center justify-between px-4 border-b border-carbon-border">
+        <div className="h-14 flex items-center justify-between px-4 border-b border-carbon-border">
           <button className="btn-ghost !p-1.5" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
-          {sidebarOpen && <span className="text-[10px] font-mono text-carbon-faint">v1.0</span>}
+          {sidebarOpen && <span className="text-[10px] font-mono text-carbon-faint">v2.0 HARDWARE</span>}
         </div>
         <nav className="flex-1 py-3 px-2 space-y-1 overflow-y-auto">
           {NAV.map((n) => (
             <button
               key={n.id}
               onClick={() => setView(n.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-sm font-mono text-xs font-bold uppercase tracking-wider transition-colors ${
                 view === n.id ? 'bg-blaze/15 text-blaze-bright border border-blaze/25' : 'text-carbon-muted hover:bg-carbon-hover hover:text-carbon-text border border-transparent'
               }`}
             >
@@ -97,17 +133,17 @@ export default function App() {
           ))}
         </nav>
         {sidebarOpen && (
-          <div className="p-3 m-2 rounded-xl bg-carbon-card border border-carbon-border text-[11px] text-carbon-muted space-y-1">
-            <p className="flex justify-between"><span>Quran total</span><b className="text-emerald2">603 pages</b></p>
-            <p className="flex justify-between"><span>Rotation</span><b className="text-carbon-text">PPL + Cardio</b></p>
-            <p className="flex justify-between"><span>Location</span><b className="text-carbon-text">Bousaada</b></p>
+          <div className="p-3 m-2 rounded-sm bg-carbon-card border border-carbon-border text-[11px] font-mono text-carbon-muted space-y-1">
+            <p className="flex justify-between"><span>Quran total</span><b className="text-emerald2">603</b></p>
+            <p className="flex justify-between"><span>Rotation</span><b className="text-carbon-text">PPL+CARDIO</b></p>
+            <p className="flex justify-between"><span>Location</span><b className="text-carbon-text">BOUSAADA</b></p>
           </div>
         )}
       </aside>
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <Header data={data} online={online} />
+        <Header data={data} online={online} onExport={handleExport} />
 
         {loading ? (
           <main className="flex-1 flex items-center justify-center">

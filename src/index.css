@@ -37,30 +37,40 @@
 
 @layer components {
   .card {
-    @apply bg-carbon-card border border-carbon-border rounded-2xl shadow-card;
+    @apply bg-carbon-card border border-carbon-border rounded-sm shadow-sm;
+  }
+  .zinc-card {
+    @apply bg-[#111115] border border-[#27272a] rounded-sm p-5;
+  }
+  .orange-glow {
+    box-shadow: 0 0 15px rgba(255, 59, 0, 0.25);
+  }
+  .dot-matrix {
+    background-image: radial-gradient(#27272a 1px, transparent 1px);
+    background-size: 6px 6px;
   }
   .card-hover {
-    @apply transition-colors duration-150 hover:border-carbon-hover;
+    @apply transition-colors duration-150 hover:border-blaze/40;
   }
   .input {
-    @apply w-full bg-carbon-bg border border-carbon-border rounded-lg px-3 py-2 text-sm text-carbon-text placeholder-carbon-faint focus:outline-none focus:border-blaze/60;
+    @apply w-full bg-carbon-bg border border-carbon-border rounded-sm px-3 py-2 text-sm text-carbon-text placeholder-carbon-faint focus:outline-none focus:border-blaze/80 font-mono;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-all font-mono;
   }
   .btn-primary {
-    @apply btn bg-blaze hover:bg-blaze-hover text-white shadow-glow;
+    @apply btn bg-blaze hover:bg-blaze-hover text-black font-extrabold orange-glow;
   }
   .btn-ghost {
-    @apply btn bg-carbon-hover text-carbon-text hover:bg-carbon-border;
+    @apply btn bg-carbon-hover text-carbon-text hover:bg-carbon-border border border-carbon-border;
   }
   .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium;
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-mono uppercase tracking-wider font-bold;
   }
   .label {
-    @apply text-[11px] font-semibold uppercase tracking-wider text-carbon-faint;
+    @apply text-[10px] font-mono font-bold uppercase tracking-widest text-carbon-faint;
   }
   .progress-track {
-    @apply h-2 rounded-full bg-carbon-hover overflow-hidden;
+    @apply h-2 rounded-none bg-carbon-hover overflow-hidden border border-carbon-border;
   }
 }

@@ -18,8 +18,8 @@ export default function HabitsCard({ habits, habitLog, today, onToggle }) {
   const doneSet = new Set(habitLog.filter((h) => h.date === today).map((h) => h.habit_id));
 
   return (
-    <Card className="p-5">
-      <SectionTitle icon="🔥" title="Habits & Streaks" />
+    <Card className="p-5 rounded-sm">
+      <SectionTitle icon="🔥" title="HABITS & STREAKS" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {(habits || []).map((h) => {
           const done = doneSet.has(h.id);
@@ -28,7 +28,7 @@ export default function HabitsCard({ habits, habitLog, today, onToggle }) {
             <button
               key={h.id}
               onClick={() => onToggle(h.id)}
-              className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
+              className={`flex items-center gap-3 rounded-sm border px-3 py-2.5 text-left transition-all ${
                 done
                   ? 'bg-blaze/10 border-blaze/30'
                   : 'bg-carbon-panel border-carbon-border hover:bg-carbon-hover'

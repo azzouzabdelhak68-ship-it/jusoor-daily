@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jusoor OS — Concept 1: Industrial Hardware</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Space Grotesk', sans-serif; background: #08080a; color: #e4e4e7; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .zinc-card { background: #111115; border: 1px solid #27272a; border-radius: 4px; }
+    .orange-glow { box-shadow: 0 0 15px rgba(255, 59, 0, 0.2); }
+    .dot-matrix { background-image: radial-gradient(#333 1px, transparent 1px); background-size: 6px 6px; }
+  </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+
+  <!-- TOP HARDWARE BAR -->
+  <header class="zinc-card p-4 mb-6 flex flex-wrap justify-between items-center gap-4">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 bg-[#ff3b00] rounded-full animate-pulse"></div>
+      <span class="mono text-xs text-zinc-400 uppercase tracking-widest">JUSOOR // SYS-808 HUD</span>
+    </div>
+    <div class="flex items-center space-x-6 mono text-xs">
+      <div><span class="text-zinc-500">PRAYER:</span> <span class="text-[#ff3b00] font-bold">ASR 15:42</span> <span class="text-zinc-400">(-01:12:04)</span></div>
+      <div><span class="text-zinc-500">TZ:</span> <span class="text-zinc-300">Africa/Algiers</span></div>
+    </div>
+    <button onclick="exportJSON()" class="mono text-xs bg-[#ff3b00] hover:bg-[#e03400] text-black font-bold px-4 py-2 uppercase tracking-wider transition-all orange-glow">
+      [ ⚡ EXPORT FOR GROQ ]
+    </button>
+  </header>
+
+  <!-- MAIN HARDWARE GRID -->
+  <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT STAGE: HERO POMODORO & TASKS (lg:7) -->
+    <section class="lg:col-span-7 space-y-6">
+
+      <!-- TASK HERO MODULE -->
+      <div class="zinc-card p-6 relative overflow-hidden">
+        <div class="flex justify-between items-start mb-4">
+          <span class="mono text-[10px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700">ACTIVE TASK // JUSOOR PROJECT</span>
+          <span class="mono text-xs text-[#ff3b00] font-bold">MODE: FOCUS</span>
+        </div>
+        
+        <h2 class="text-2xl font-bold tracking-tight mb-4 text-white">Refactor Auth Middleware & Edge Functions</h2>
+
+        <!-- HARDWARE TIMER DIAL -->
+        <div class="dot-matrix bg-black/60 p-6 rounded border border-zinc-800 flex flex-wrap items-center justify-between gap-6">
+          <div class="flex items-center space-x-6">
+            <div class="mono text-5xl font-extrabold text-[#ff3b00] tracking-tighter" id="timer">24:59</div>
+            <div class="mono text-xs text-zinc-400 space-y-1">
+              <div>SESSION: <span class="text-white">1 of 4</span></div>
+              <div>TODAY: <span class="text-white">2.5 HRS</span></div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="toggleTimer()" id="playBtn" class="mono text-xs bg-zinc-100 hover:bg-white text-black font-bold px-4 py-3 uppercase border border-white">▶ START</button>
+            <button onclick="resetTimer()" class="mono text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 px-3 py-3 border border-zinc-700">+5m</button>
+            <button class="mono text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 px-3 py-3 border border-zinc-700">SKIP</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QURAN ADAPTIVE HARDWARE MODULE -->
+      <div class="zinc-card p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="mono text-xs text-[#ff3b00]">📖</span>
+            <h3 class="font-bold text-sm uppercase tracking-wider">Quran Adaptive Engine</h3>
+          </div>
+          <span class="mono text-xs text-zinc-500">TARGET RANGE: 300 → 340</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div class="bg-black/50 p-3 rounded border border-zinc-800">
+            <div class="mono text-[10px] text-zinc-500 mb-1">SUGGESTED START</div>
+            <div class="mono text-xl font-bold text-zinc-200">PAGE 300</div>
+          </div>
+          <div class="bg-black/50 p-3 rounded border border-zinc-800">
+            <div class="mono text-[10px] text-zinc-500 mb-1">SUGGESTED END</div>
+            <div class="mono text-xl font-bold text-zinc-200">PAGE 339</div>
+          </div>
+          <div class="bg-black/80 p-3 rounded border border-[#ff3b00]/40">
+            <div class="mono text-[10px] text-[#ff3b00] mb-1">ACTUAL STOP PAGE (OVERRIDE)</div>
+            <input type="number" id="quranStop" value="310" onchange="updateQuran(this.value)" class="mono text-xl font-bold bg-transparent text-white w-full outline-none focus:text-[#ff3b00]" />
+          </div>
+        </div>
+
+        <div class="mono text-xs text-zinc-400 bg-zinc-900/80 p-3 rounded border border-zinc-800 flex justify-between items-center">
+          <span>⚡ AUTO-ADAPT: Tomorrow automatically starts at <strong class="text-[#ff3b00]" id="nextQuranStart">311</strong></span>
+          <span class="text-[10px] text-zinc-500">NO MANUAL MATH REQUIRED</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT STAGE: SLEEP, GYM, HABITS (lg:5) -->
+    <section class="lg:col-span-5 space-y-6">
+
+      <!-- SLEEP ENGINE MODULE -->
+      <div class="zinc-card p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="mono text-xs text-[#ff3b00]">😴</span>
+            <h3 class="font-bold text-sm uppercase tracking-wider">Sleep Engine & Battery</h3>
+          </div>
+          <span class="mono text-xs bg-[#ff3b00]/20 text-[#ff3b00] px-2 py-0.5 rounded border border-[#ff3b00]/30">BATTERY: 88%</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="bg-black/50 p-3 rounded border border-zinc-800">
+            <div class="mono text-[10px] text-zinc-500 mb-1">BEDTIME (ISHA+90m)</div>
+            <input type="text" value="22:40" class="mono text-lg font-bold bg-transparent text-white w-full outline-none" />
+          </div>
+          <div class="bg-black/50 p-3 rounded border border-zinc-800">
+            <div class="mono text-[10px] text-zinc-500 mb-1">WAKE TIME (FAJR-10m)</div>
+            <input type="text" value="04:07" class="mono text-lg font-bold bg-transparent text-white w-full outline-none" />
+          </div>
+        </div>
+
+        <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden mb-2">
+          <div class="bg-[#ff3b00] h-full w-[88%]"></div>
+        </div>
+        <div class="mono text-[10px] text-zinc-500 flex justify-between">
+          <span>SLEEP DEBT: NONE</span>
+          <span>ESTIMATED DURATION: 5h 27m</span>
+        </div>
+      </div>
+
+      <!-- GYM ROTATION MODULE -->
+      <div class="zinc-card p-6">
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="mono text-xs text-[#ff3b00]">💪</span>
+            <h3 class="font-bold text-sm uppercase tracking-wider">Gym Rotation</h3>
+          </div>
+          <span class="mono text-xs text-zinc-400">PPL CYCLE</span>
+        </div>
+
+        <div class="bg-black/50 p-4 rounded border border-zinc-800 mb-4 flex justify-between items-center">
+          <div>
+            <div class="mono text-[10px] text-zinc-500">TODAY'S WORKOUT</div>
+            <div class="text-lg font-extrabold text-white">PUSH A (CHEST & TRICEPS)</div>
+          </div>
+          <button onclick="this.innerText='✓ COMPLETED'; this.classList.add('bg-emerald-600')" class="mono text-xs bg-[#ff3b00] text-black font-bold px-4 py-2 rounded uppercase">
+            MARK DONE
+          </button>
+        </div>
+
+        <div class="mono text-[10px] text-zinc-500 flex justify-between">
+          <span>NEXT: PULL A</span>
+          <span>CYCLE 3 OF 4</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    function updateQuran(val) {
+      document.getElementById('nextQuranStart').innerText = parseInt(val || 310) + 1;
+    }
+    let timerOn = false;
+    function toggleTimer() {
+      timerOn = !timerOn;
+      document.getElementById('playBtn').innerText = timerOn ? '⏸ PAUSE' : '▶ START';
+    }
+    function resetTimer() {
+      document.getElementById('timer').innerText = "29:59";
+    }
+    function exportJSON() {
+      const data = {
+        timestamp: new Date().toISOString(),
+        quran_stop: document.getElementById('quranStop').value,
+        sleep_battery: '88%',
+        workout: 'Push A',
+        focus_hrs: '2.5'
+      };
+      const str = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText("Analyze this Jusoor Daily JSON state in Groq:\n" + str);
+      alert("JSON State copied to clipboard! Paste directly into Groq/Claude.");
+    }
+  </script>
+</body>
+</html>

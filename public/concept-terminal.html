@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jusoor OS — Concept 3: Warp Hacker Terminal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'JetBrains Mono', monospace; background: #000; color: #00ff66; }
+    .term-border { border: 1px solid #1a3a22; }
+    .term-header { background: #051409; border-bottom: 1px solid #1a3a22; }
+    .keybadge { background: #0d2814; color: #00ff66; border: 1px solid #00ff66; padding: 1px 5px; border-radius: 2px; }
+  </style>
+</head>
+<body class="p-4 text-xs leading-relaxed min-h-screen">
+
+  <!-- TOP COMMAND BAR -->
+  <header class="term-border term-header p-3 mb-4 flex flex-wrap justify-between items-center gap-2">
+    <div>
+      <span class="text-zinc-500">jusoor-os:~ $</span> <span class="text-white">status --live</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <span>[PRAYER: <span class="text-yellow-400">ASR 15:42</span>]</span>
+      <button onclick="copyExport()" class="keybadge hover:bg-emerald-950 font-bold">[E] EXPORT GROQ JSON</button>
+    </div>
+  </header>
+
+  <!-- TMUX GRID -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+    <!-- LEFT PANE: ACTIVE TASK + POMODORO (8 cols) -->
+    <div class="lg:col-span-8 space-y-4">
+      
+      <!-- TASK PANAL -->
+      <div class="term-border p-4 bg-black">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-zinc-500">=== PANE 0: ACTIVE TASK ===</span>
+          <span class="keybadge">[P] POMODORO</span>
+        </div>
+        
+        <div class="text-white text-base font-bold my-2">> Refactor Auth Middleware & Edge Functions</div>
+
+        <!-- ASCII PROGRESS BAR -->
+        <div class="my-3 text-emerald-400">
+          <div>TIMER: 24:59 <span class="text-zinc-500">[████████████████████░░░░░░] 80%</span></div>
+        </div>
+
+        <div class="text-zinc-400 text-[11px] flex space-x-4">
+          <span>SHORTCUTS:</span>
+          <span><span class="keybadge">space</span> toggle</span>
+          <span><span class="keybadge">r</span> reset</span>
+          <span><span class="keybadge">s</span> skip</span>
+        </div>
+      </div>
+
+      <!-- QURAN OVERRIDE PANE -->
+      <div class="term-border p-4 bg-black">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-zinc-500">=== PANE 1: QURAN ENGINE ===</span>
+          <span class="text-yellow-400">TARGET: 300-340</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 my-2 text-white">
+          <div>START: 300</div>
+          <div>SUGGESTED: 340</div>
+          <div>ACTUAL READ: <input type="number" value="310" class="bg-zinc-900 text-yellow-400 w-16 text-center border border-zinc-700 outline-none" /></div>
+        </div>
+
+        <div class="text-zinc-400">
+          PROGRESS: [██████░░░░░░░░░░] 31% | NEXT DAY AUTO-SHIFT: 311
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANE: SLEEP & GYM (4 cols) -->
+    <div class="lg:col-span-4 space-y-4">
+
+      <div class="term-border p-4 bg-black">
+        <div class="text-zinc-500 mb-2">=== PANE 2: SLEEP & METRICS ===</div>
+        <div>ISHA+90m Bedtime: <span class="text-white">22:40</span></div>
+        <div>FAJR-10m Wake  : <span class="text-white">04:07</span></div>
+        <div class="my-2">BATTERY: <span class="text-emerald-400">[████████████░░] 88%</span></div>
+      </div>
+
+      <div class="term-border p-4 bg-black">
+        <div class="text-zinc-500 mb-2">=== PANE 3: GYM ROTATION ===</div>
+        <div class="text-white font-bold mb-1">> TODAY: PUSH A (CHEST/TRI)</div>
+        <button class="keybadge my-1">[x] MARK DONE</button>
+        <div class="text-zinc-500 mt-2">NEXT: PULL A</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function copyExport() {
+      alert("Groq JSON exported to clipboard!");
+    }
+  </script>
+</body>
+</html>

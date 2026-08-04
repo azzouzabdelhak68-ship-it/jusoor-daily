@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, SectionTitle, ProgressBar } from './ui.jsx';
-import { QURAN_TOTAL, suggestedEnd, progressPercent } from '../lib/quran.js';
+import { QURAN_TOTAL, suggestedEnd, progressPercent, nextStart } from '../lib/quran.js';
 import { yesterdayStr } from '../lib/time.js';
 
 export default function QuranCard({ day, days, onSave }) {
@@ -14,8 +14,7 @@ export default function QuranCard({ day, days, onSave }) {
 
   const history = (days || [])
     .filter((d) => d.quran_end != null)
-    .slice(-7)
-    .map((d) => ({ date: d.date, start: d.quran_start, end: d.quran_end }));
+    .slice(-7);
 
   const submit = (e) => {
     e.preventDefault();
@@ -25,71 +24,69 @@ export default function QuranCard({ day, days, onSave }) {
     setInput('');
   };
 
+  const pct = progressPercent(day.quran_end || lastRead);
+  const tomorrow = nextStart(qStart, day.quran_end);
+
   return (
-    <Card className="p-5">
+    <Card className="p-5 rounded-sm">
       <SectionTitle
         icon="📖"
-        title="Quran — 603 pages"
-        right={
-          <span className="font-mono text-xs text-carbon-muted">
-            {progressPercent(day.quran_end || lastRead)}%
-          </span>
-        }
+        title="QURAN ADAPTIVE ENGINE"
+        right={<span className="font-mono text-xs text-carbon-muted uppercase">603 pages</span>}
       />
-      <ProgressBar value={progressPercent(day.quran_end || lastRead)} color="bg-emerald2" className="mb-4" />
 
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="rounded-xl bg-carbon-panel border border-carbon-border p-3">
-          <p className="label text-emerald2/80">Yesterday</p>
-          <p className="mt-1 font-mono font-bold text-sm">
-            {yesterday && yesterday.quran_start
-              ? `${yesterday.quran_start} → ${yesterday.quran_end || '—'}`
-              : '—'}
-          </p>
+      <ProgressBar value={pct} color="bg-blaze" className="mb-4" />
+
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="rounded-sm bg-[#0a0a0c] border border-carbon-border p-3">
+          <p className="label text-emerald2/80">Suggestion</p>
+          <p className="mt-1 font-mono font-bold text-sm text-carbon-text">{qStart} → {qEndSuggest}</p>
         </div>
-        <div className="rounded-xl bg-blaze/10 border border-blaze/25 p-3">
-          <p className="label text-blaze-bright">Today's suggestion</p>
-          <p className="mt-1 font-mono font-bold text-sm text-blaze-bright">
-            {qStart} → {qEndSuggest}
-          </p>
+        <div className="rounded-sm bg-[#0a0a0c] border border-carbon-border p-3">
+          <p className="label text-blaze-bright">Read up to</p>
+          <input
+            type="number"
+            min={qStart}
+            max={QURAN_TOTAL}
+            placeholder={day.quran_end ? String(day.quran_end) : '—'}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && submit(e)}
+            className="w-full mt-1 bg-transparent font-mono font-bold text-lg text-blaze outline-none placeholder:text-carbon-faint border-b border-dashed border-carbon-border focus:border-blaze"
+          />
+        </div>
+        <div className="rounded-sm bg-blaze/10 border border-blaze/25 p-3">
+          <p className="label text-blaze">% of 603</p>
+          <p className="mt-1 font-mono font-bold text-lg text-blaze">{pct}%</p>
         </div>
       </div>
 
-      <form onSubmit={submit} className="flex gap-2 mb-4">
-        <input
-          type="number"
-          min={qStart}
-          max={QURAN_TOTAL}
-          placeholder={`End page (${qStart}–${QURAN_TOTAL})`}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="input"
-        />
-        <button type="submit" className="btn-primary shrink-0">
-          Save
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <button
+          onClick={submit}
+          disabled={!input}
+          className="font-mono text-[10px] font-extrabold uppercase tracking-wider bg-blaze hover:bg-blaze-hover text-black disabled:opacity-40 px-3 py-1.5 rounded-sm orange-glow"
+        >
+          ⚡ Save Progress
         </button>
-      </form>
-
-      {day.quran_end != null ? (
-        <p className="text-xs text-emerald2 mb-3">
-          ✓ Logged today: {qStart} → {day.quran_end}
-          {day.quran_end >= QURAN_TOTAL ? ' — Khatm! Wraps back to page 1 tomorrow 🎉' : ` — tomorrow starts at ${day.quran_end + 1}`}
-        </p>
-      ) : (
-        <p className="text-xs text-carbon-muted mb-3">
-          After you log, tomorrow's start page is auto-set to page {lastRead >= QURAN_TOTAL ? 1 : lastRead + 1}.
-        </p>
-      )}
+        <span className="font-mono text-[10px] text-carbon-muted">
+          {day.quran_end != null
+            ? day.quran_end >= QURAN_TOTAL
+              ? 'Khatm! wraps to page 1 tomorrow'
+              : `tomorrow auto-starts at page ${tomorrow}`
+            : 'tomorrow auto-starts at page 1'}
+        </span>
+      </div>
 
       {history.length > 0 && (
-        <div>
+        <div className="mt-2">
           <p className="label mb-2">Last reads</p>
           <div className="flex items-end gap-1.5 h-14">
             {history.map((h) => (
-              <div key={h.date} className="flex-1 flex flex-col justify-end">
+              <div key={h.date} className="flex-1 flex flex-col justify-end" title={h.date}>
                 <div
-                  className="rounded-t bg-gradient-to-t from-emerald2/70 to-emerald2/30"
-                  style={{ height: `${Math.min(100, ((h.end - h.start + 1) / 50) * 100)}%` }}
+                  className="rounded-sm bg-gradient-to-t from-blaze/70 to-blaze/30"
+                  style={{ height: `${Math.min(100, ((h.quran_end - h.quran_start + 1) / 50) * 100)}%` }}
                 />
               </div>
             ))}

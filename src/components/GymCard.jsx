@@ -22,10 +22,10 @@ export default function GymCard({ day, plans, onToggleGym, onCardio, onEditPlan 
   };
 
   return (
-    <Card className="p-5">
+    <Card className="p-5 rounded-sm">
       <SectionTitle
         icon="💪"
-        title={`Today: ${gymType}`}
+        title={`GYM ROTATION // ${gymType}`}
         right={
           <span className={`badge border`} style={{ color: TYPE_COLORS[gymType], borderColor: `${TYPE_COLORS[gymType]}55`, background: `${TYPE_COLORS[gymType]}18` }}>
             {TYPE_ICON[gymType]} {gymType}
@@ -34,7 +34,7 @@ export default function GymCard({ day, plans, onToggleGym, onCardio, onEditPlan 
       />
 
       {day.gym_done ? (
-        <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-center">
+        <div className="rounded-sm bg-emerald-500/10 border border-emerald-500/20 p-4 text-center">
           <p className="text-2xl">🏆</p>
           <p className="font-bold text-emerald2 mt-1">Workout logged — nice work!</p>
           {day.cardio_min > 0 && <p className="text-xs text-carbon-muted mt-1">+ {day.cardio_min} min cardio</p>}
@@ -47,11 +47,11 @@ export default function GymCard({ day, plans, onToggleGym, onCardio, onEditPlan 
               <button
                 key={i}
                 onClick={() => setChecked((c) => ({ ...c, [i]: !c[i] }))}
-                className={`w-full flex items-center gap-3 rounded-xl border px-3 py-2 text-left transition-colors ${
+                className={`w-full flex items-center gap-3 rounded-sm border px-3 py-2 text-left transition-colors ${
                   checked[i] ? 'bg-blaze/10 border-blaze/30' : 'bg-carbon-panel border-carbon-border hover:bg-carbon-hover'
                 }`}
               >
-                <span className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs shrink-0 ${checked[i] ? 'bg-blaze border-blaze text-white' : 'border-carbon-border'}`}>
+                <span className={`w-5 h-5 rounded-sm border flex items-center justify-center text-xs shrink-0 ${checked[i] ? 'bg-blaze border-blaze text-white' : 'border-carbon-border'}`}>
                   {checked[i] ? '✓' : ''}
                 </span>
                 <span className={`flex-1 text-sm ${checked[i] ? 'line-through text-carbon-muted' : 'text-carbon-text'}`}>{ex.name}</span>

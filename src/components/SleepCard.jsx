@@ -3,7 +3,8 @@ import { Card, SectionTitle } from './ui.jsx';
 import { minutesOf, fmtDuration } from '../lib/time.js';
 
 export default function SleepCard({ day, onSave }) {
-  const [fields, setFields] = useState({});
+  const [wake, setWake] = useState('');
+  const [bed, setBed] = useState('');
   if (!day) return null;
 
   const wakeM = minutesOf(day.wake_time);
@@ -12,80 +13,66 @@ export default function SleepCard({ day, onSave }) {
   if (wakeM !== null && sleepM !== null) {
     dur = ((sleepM - wakeM) % 1440 + 1440) % 1440;
   }
+  const hours = dur ? dur / 60 : 0;
+  const battery = Math.max(0, Math.min(100, Math.round(((hours - 4.5) / 4) * 100)));
 
-  const commit = (key, value) => {
-    if (value === '' || value === null) return;
-    onSave({ [key]: value });
-    setFields({});
-  };
-
-  const quick = [
-    { key: 'weight', label: 'Weight (kg)', type: 'number', step: '0.1', value: day.weight },
-    { key: 'steps', label: 'Steps', type: 'number', value: day.steps },
-    { key: 'calories', label: 'Calories', type: 'number', value: day.calories },
-  ];
+  const batteryWarn = battery < 55;
+  const batteryColor = batteryWarn ? 'bg-gold' : 'bg-emerald2';
 
   return (
-    <Card className="p-5">
-      <SectionTitle icon="😴" title="Sleep & Body" />
+    <Card className="p-5 rounded-sm">
+      <SectionTitle
+        icon="😴"
+        title="SLEEP ENGINE"
+        right={
+          <span className={`font-mono text-xs font-bold uppercase ${batteryWarn ? 'text-gold' : 'text-emerald2'}`}>
+            ⚡ {battery}%
+          </span>
+        }
+      />
 
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="rounded-xl bg-carbon-panel border border-carbon-border p-3 text-center">
-          <p className="label text-blaze-bright">Wake</p>
-          <p className="mt-1 font-mono text-2xl font-black text-carbon-text">{day.wake_time || '—'}</p>
-          <p className="text-[10px] text-carbon-faint mt-1">Fajr − 10 min</p>
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="rounded-sm bg-[#0a0a0c] border border-carbon-border p-3">
+          <p className="label text-blaze-bright">Wake (Fajr −10m)</p>
+          <div className="flex items-center gap-1 mt-1">
+            <input
+              type="time"
+              value={wake || day.wake_time || ''}
+              onChange={(e) => setWake(e.target.value)}
+              onBlur={(e) => e.target.value && onSave({ wake_time: e.target.value })}
+              className="w-full bg-transparent font-mono text-lg font-black text-carbon-text outline-none"
+            />
+          </div>
         </div>
-        <div className="rounded-xl bg-carbon-panel border border-carbon-border p-3 text-center">
-          <p className="label text-violet2">Sleep</p>
-          <p className="mt-1 font-mono text-2xl font-black text-carbon-text">{day.sleep_time || '—'}</p>
-          <p className="text-[10px] text-carbon-faint mt-1">Isha + 1h30</p>
+        <div className="rounded-sm bg-[#0a0a0c] border border-carbon-border p-3">
+          <p className="label text-violet2">Sleep (Isha +1h30)</p>
+          <div className="flex items-center gap-1 mt-1">
+            <input
+              type="time"
+              value={bed || day.sleep_time || ''}
+              onChange={(e) => setBed(e.target.value)}
+              onBlur={(e) => e.target.value && onSave({ sleep_time: e.target.value })}
+              className="w-full bg-transparent font-mono text-lg font-black text-carbon-text outline-none"
+            />
+          </div>
         </div>
       </div>
 
       {dur !== null && (
-        <p className="text-center text-xs text-carbon-muted mb-4">
-          Target duration: <span className="font-mono font-bold text-carbon-text">{fmtDuration(dur)}</span>
+        <p className="font-mono text-[10px] text-carbon-muted mb-2">
+          Target duration: <span className="font-bold text-carbon-text">{fmtDuration(dur)}</span>
         </p>
       )}
 
-      <div className="space-y-2">
-        {quick.map((q) => (
-          <div key={q.key} className="flex items-center gap-2">
-            <input
-              type={q.type}
-              step={q.step}
-              placeholder={`${q.label}${q.value != null ? ` (${q.value})` : ''}`}
-              value={fields[q.key] ?? ''}
-              onChange={(e) => setFields((f) => ({ ...f, [q.key]: e.target.value }))}
-              className="input"
-            />
-            <button
-              className="btn-ghost shrink-0 text-xs"
-              onClick={() => commit(q.key, fields[q.key])}
-            >
-              Save
-            </button>
-          </div>
-        ))}
+      <div className="w-full h-2 bg-carbon-hover border border-carbon-border overflow-hidden mb-1">
+        <div
+          className={`h-full ${batteryColor} transition-all`}
+          style={{ width: `${battery}%` }}
+        />
       </div>
-
-      <div className="mt-3">
-        <p className="label mb-1.5">Mood</p>
-        <div className="flex gap-1.5">
-          {[1, 2, 3, 4, 5].map((m) => (
-            <button
-              key={m}
-              onClick={() => onSave({ mood: m })}
-              className={`flex-1 py-1.5 rounded-lg text-sm transition-all ${
-                day.mood === m
-                  ? 'bg-blaze/20 border border-blaze/40'
-                  : 'bg-carbon-panel border border-carbon-border hover:bg-carbon-hover'
-              }`}
-            >
-              {['😞', '🙁', '😐', '🙂', '😄'][m - 1]}
-            </button>
-          ))}
-        </div>
+      <div className="font-mono text-[9px] uppercase tracking-widest text-carbon-faint flex justify-between">
+        <span>{batteryWarn ? 'LOW BATTERY — LIGHT WORKOUT ADVISED' : 'BATTERY CHARGED'}</span>
+        <span>{dur ? fmtDuration(dur) : '—'}</span>
       </div>
     </Card>
   );
