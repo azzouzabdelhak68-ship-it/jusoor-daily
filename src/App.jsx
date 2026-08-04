@@ -206,6 +206,7 @@ export default function App() {
                 notifOn={notifOn}
                 onNotif={(v) => setNotifOn(v)}
                 onRefresh={app.refresh}
+                onReset={app.resetData}
               />
             )}
           </main>

@@ -26,7 +26,12 @@ export function useAppData() {
   }, [load]);
 
   const refresh = useCallback(() => {
-    load();
+    return load();
+  }, [load]);
+
+  const resetData = useCallback(async () => {
+    await api.reset();
+    await load();
   }, [load]);
 
   // -------- mutation helpers (optimistic, then push) --------
@@ -115,6 +120,7 @@ export function useAppData() {
     online,
     error,
     refresh,
+    resetData,
     saveDayPatch,
     addTask,
     updateTask,

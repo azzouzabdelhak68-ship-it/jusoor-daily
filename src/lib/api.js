@@ -221,6 +221,11 @@ const local = {
     writeLocal(s);
     return { date, habit_id: habitId, done: true };
   },
+  reset() {
+    const s = seedDemo();
+    writeLocal(s);
+    return { reset: true };
+  },
 };
 
 // ---------- exported API ----------
@@ -314,6 +319,15 @@ export const api = {
     } catch {
       mode = 'local';
       return local.toggleHabit(date, habitId);
+    }
+  },
+  async reset() {
+    if (mode === 'local') return local.reset();
+    try {
+      return await serverRequest('reset', { method: 'POST' });
+    } catch {
+      mode = 'local';
+      return local.reset();
     }
   },
 };
