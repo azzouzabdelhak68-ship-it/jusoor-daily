@@ -1,0 +1,46 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  environment = { NODE_VERSION = "20" }
+
+# API function routing (clean paths to Netlify Functions)
+[[redirects]]
+  from = "/api/days"
+  to = "/.netlify/functions/days"
+  status = 200
+
+[[redirects]]
+  from = "/api/tasks"
+  to = "/.netlify/functions/tasks"
+  status = 200
+
+[[redirects]]
+  from = "/api/books"
+  to = "/.netlify/functions/books"
+  status = 200
+
+[[redirects]]
+  from = "/api/workouts"
+  to = "/.netlify/functions/workouts"
+  status = 200
+
+[[redirects]]
+  from = "/api/habits"
+  to = "/.netlify/functions/habits"
+  status = 200
+
+[[redirects]]
+  from = "/api/state"
+  to = "/.netlify/functions/state"
+  status = 200
+
+[[redirects]]
+  from = "/api/daily-prep"
+  to = "/.netlify/functions/daily-prep"
+  status = 200
+
+# SPA fallback (must be last)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

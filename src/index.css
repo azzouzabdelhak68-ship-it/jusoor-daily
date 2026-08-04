@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-carbon-bg;
+  }
+  body {
+    @apply bg-carbon-bg text-carbon-text antialiased;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+  }
+  ::selection {
+    background: rgba(239, 68, 68, 0.35);
+  }
+  input, select, textarea, button {
+    font-family: inherit;
+  }
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-carbon-card border border-carbon-border rounded-2xl shadow-card;
+  }
+  .card-hover {
+    @apply transition-colors duration-150 hover:border-carbon-hover;
+  }
+  .input {
+    @apply w-full bg-carbon-bg border border-carbon-border rounded-lg px-3 py-2 text-sm text-carbon-text placeholder-carbon-faint focus:outline-none focus:border-blaze/60;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-blaze hover:bg-blaze-hover text-white shadow-glow;
+  }
+  .btn-ghost {
+    @apply btn bg-carbon-hover text-carbon-text hover:bg-carbon-border;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium;
+  }
+  .label {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-carbon-faint;
+  }
+  .progress-track {
+    @apply h-2 rounded-full bg-carbon-hover overflow-hidden;
+  }
+}

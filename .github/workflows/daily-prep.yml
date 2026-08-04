@@ -1,0 +1,25 @@
+name: Daily Prep
+
+on:
+  schedule:
+    # 22:55 UTC = 23:55 Africa/Algiers (GMT+1, no DST) — prepares "tomorrow"
+    - cron: '55 22 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify daily-prep function
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          PREP_TOKEN: ${{ secrets.PREP_TOKEN }}
+        run: |
+          if [ -z "$SITE_URL" ]; then
+            echo "::error::SITE_URL secret is not set (e.g. https://your-site.netlify.app)"
+            exit 1
+          fi
+          curl -sS -X POST "$SITE_URL/api/daily-prep" \
+            -H "Content-Type: application/json" \
+            -H "x-prep-token: $PREP_TOKEN" \
+            -d '{}'
