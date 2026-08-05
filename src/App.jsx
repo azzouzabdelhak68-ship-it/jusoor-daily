@@ -16,12 +16,14 @@ import StatsPanel from './components/StatsPanel.jsx';
 import TaskPanel from './components/TaskPanel.jsx';
 import BooksView from './components/BooksView.jsx';
 import SettingsView from './components/SettingsView.jsx';
+import WorkoutSplitView from './components/WorkoutSplitView.jsx';
 import { TaskModal, BookModal, WorkoutModal } from './components/Modals.jsx';
 
 const NAV = [
   { id: 'today', label: 'Dashboard', icon: '🏠' },
   { id: 'tasks', label: 'Tasks', icon: '📌' },
   { id: 'books', label: 'Books', icon: '📚' },
+  { id: 'split', label: 'Split', icon: '🏋️' },
   { id: 'stats', label: 'Stats', icon: '📊' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
 ];
@@ -35,6 +37,7 @@ export default function App() {
 
   const { data, loading, online } = app;
   const todayRow = data?.todayRow;
+  const activeSplit = (data?.splits || []).find((s) => s.is_active) || data?.splits?.[0];
 
   useEffect(() => {
     localStorage.setItem('jusoor_notif', notifOn ? 'on' : 'off');
@@ -176,10 +179,11 @@ export default function App() {
                     />
                     <GymCard
                       day={todayRow}
-                      plans={data.plans}
+                      split={activeSplit}
+                      prs={data.prs}
                       onToggleGym={() => app.saveDayPatch({ gym_done: !todayRow.gym_done })}
-                      onCardio={(m) => app.saveDayPatch({ cardio_min: m })}
-                      onEditPlan={(plan) => setModal({ type: 'workout', plan })}
+                      onAddPr={app.addPr}
+                      onEditSplit={() => setView('split')}
                     />
                   </div>
                 </div>
@@ -234,6 +238,16 @@ export default function App() {
               <div className="max-w-6xl mx-auto">
                 <StatsPanel days={data.days} tasksToday={todayTasks} />
               </div>
+            )}
+
+            {view === 'split' && (
+              <WorkoutSplitView
+                splits={data.splits}
+                prs={data.prs}
+                onSaveSplit={app.saveSplit}
+                onDeleteSplit={app.deleteSplit}
+                online={online}
+              />
             )}
 
             {view === 'settings' && (

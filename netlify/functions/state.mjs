@@ -14,13 +14,15 @@ async function main() {
   const todayRow = await prepDay(db, today);
   const tomorrowRow = await prepDay(db, tomorrow);
 
-  const [days, tasksToday, tasksTomorrow, books, plans, habits] = await Promise.all([
+  const [days, tasksToday, tasksTomorrow, books, plans, habits, splits, prs] = await Promise.all([
     db.sql`SELECT * FROM days WHERE date >= ${from} ORDER BY date ASC`,
     db.sql`SELECT * FROM tasks WHERE date = ${today} ORDER BY start_time ASC NULLS LAST, id ASC`,
     db.sql`SELECT * FROM tasks WHERE date = ${tomorrow} ORDER BY start_time ASC NULLS LAST, id ASC`,
     db.sql`SELECT * FROM books ORDER BY status ASC, title ASC`,
     db.sql`SELECT * FROM workout_plans ORDER BY id ASC`,
     db.sql`SELECT * FROM habits ORDER BY sort ASC, id ASC`,
+    db.sql`SELECT * FROM splits ORDER BY updated_at DESC, id ASC`,
+    db.sql`SELECT * FROM prs ORDER BY date DESC, id DESC LIMIT 300`,
   ]);
 
   const log = await db.sql`SELECT date, habit_id FROM habit_log WHERE date >= ${from}`;
@@ -37,6 +39,8 @@ async function main() {
     plans,
     habits,
     habitLog: log,
+    splits,
+    prs,
   });
 }
 

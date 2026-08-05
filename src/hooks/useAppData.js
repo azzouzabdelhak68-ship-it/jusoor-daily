@@ -114,6 +114,36 @@ export function useAppData() {
     void existing;
   }, [data, mutateData]);
 
+  const saveSplit = useCallback(async (split) => {
+    const saved = await api.saveSplit(split);
+    mutateData((d) => {
+      let splits = d.splits || [];
+      if (split.id) {
+        splits = splits.map((x) => (x.id === split.id ? { ...x, ...split } : x));
+      } else {
+        splits = [...splits, saved];
+      }
+      if (split.is_active) splits = splits.map((x) => (x.id !== saved.id ? { ...x, is_active: false } : x));
+      return { ...d, splits };
+    });
+    return saved;
+  }, [mutateData]);
+
+  const deleteSplit = useCallback(async (id) => {
+    await api.deleteSplit(id);
+    mutateData((d) => ({ ...d, splits: (d.splits || []).filter((x) => x.id !== id) }));
+  }, [mutateData]);
+
+  const addPr = useCallback(async (entry) => {
+    const created = await api.addPr({ date: data.today, ...entry });
+    mutateData((d) => ({ ...d, prs: [created, ...(d.prs || [])].slice(0, 300) }));
+    return created;
+  }, [data, mutateData]);
+
+  const forecastSplit = useCallback((n) => {
+    return api.forecastSplit(n);
+  }, []);
+
   return {
     data,
     loading,
@@ -130,5 +160,9 @@ export function useAppData() {
     deleteBook,
     updatePlan,
     toggleHabit,
+    saveSplit,
+    deleteSplit,
+    addPr,
+    forecastSplit,
   };
 }

@@ -21,7 +21,7 @@ export default function SettingsView({ online, notifOn, onNotif, onRefresh, onRe
 
   const handleReset = async () => {
     const ok = window.confirm(
-      'Delete ALL data (days, tasks, books, workouts, habits and logs)? This cannot be undone. Today and tomorrow will regenerate.'
+      'Delete ALL data — every day, task, book, workout split, PR record, habit log, and reset the Quran back to page 1. This cannot be undone. Today and tomorrow will regenerate from a clean state.'
     );
     if (!ok) return;
     setResetting(true);
@@ -79,7 +79,7 @@ export default function SettingsView({ online, notifOn, onNotif, onRefresh, onRe
       <Card className="p-6 border-red-500/20">
         <SectionTitle icon="⚠️" title="Danger zone" />
         <p className="text-xs text-carbon-muted mb-3">
-          Permanently delete every day, task, book, workout, habit and log entry. Today and tomorrow will be recreated fresh.
+          Permanently delete every day, task, book, workout split, PR record, habit and log entry. Quran progress resets to page 1. Today and tomorrow will be recreated fresh.
         </p>
         <button
           className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-500/90 hover:bg-red-500 disabled:opacity-50 transition-colors"

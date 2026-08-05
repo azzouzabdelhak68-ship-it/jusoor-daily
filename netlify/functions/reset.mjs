@@ -9,7 +9,7 @@ async function main(event) {
   const db = getDatabase();
   try {
     await db.sql`
-      TRUNCATE habit_log, tasks, days, books, workout_plans, habits RESTART IDENTITY CASCADE
+      TRUNCATE habit_log, tasks, days, books, prs, splits, workout_plans, habits RESTART IDENTITY CASCADE
     `;
 
     await db.sql`
@@ -28,6 +28,15 @@ async function main(event) {
         ('Read book', '📚', '#3b82f6', 4),
         ('Sleep early', '😴', '#8b5cf6', 5),
         ('Water', '💧', '#06b6d4', 6)
+    `;
+
+    // Re-seed the default active split (same as migration 2).
+    await db.sql`
+      INSERT INTO splits (name, days, is_active) VALUES (
+        'Classic PPL + Cardio',
+        '[{"label":"Push","rest":false,"exercises":[{"name":"Bench Press","muscle":"Chest","equipment":"Barbell","sets":4,"reps":8,"icon":"🏋️"},{"name":"Overhead Press","muscle":"Shoulders","equipment":"Barbell","sets":4,"reps":8,"icon":"🏋️"},{"name":"Incline Dumbbell Press","muscle":"Chest","equipment":"Dumbbell","sets":3,"reps":10,"icon":"🏋️"},{"name":"Lateral Raises","muscle":"Shoulders","equipment":"Dumbbell","sets":4,"reps":12,"icon":"🏋️"},{"name":"Tricep Dips","muscle":"Triceps","equipment":"Bodyweight","sets":3,"reps":12,"icon":"🏋️"}]},{"label":"Pull","rest":false,"exercises":[{"name":"Deadlift","muscle":"Back","equipment":"Barbell","sets":4,"reps":6,"icon":"🧗"},{"name":"Barbell Row","muscle":"Back","equipment":"Barbell","sets":4,"reps":8,"icon":"🧗"},{"name":"Pull-Ups","muscle":"Back","equipment":"Bodyweight","sets":4,"reps":8,"icon":"🧗"},{"name":"Face Pulls","muscle":"Shoulders","equipment":"Cable","sets":3,"reps":15,"icon":"🛡️"},{"name":"Bicep Curls","muscle":"Biceps","equipment":"Barbell","sets":3,"reps":12,"icon":"💪"}]},{"label":"Rest","rest":true,"exercises":[]},{"label":"Legs","rest":false,"exercises":[{"name":"Squats","muscle":"Quads","equipment":"Barbell","sets":4,"reps":8,"icon":"🦵"},{"name":"Romanian Deadlift","muscle":"Hamstrings","equipment":"Barbell","sets":4,"reps":10,"icon":"🦵"},{"name":"Leg Press","muscle":"Quads","equipment":"Machine","sets":3,"reps":12,"icon":"🦵"},{"name":"Walking Lunges","muscle":"Glutes","equipment":"Dumbbell","sets":3,"reps":12,"icon":"🍑"},{"name":"Calf Raises","muscle":"Calves","equipment":"Machine","sets":4,"reps":15,"icon":"🦶"}]},{"label":"Cardio","rest":false,"exercises":[{"name":"Run / Treadmill","muscle":"Cardio","equipment":"Machine","sets":1,"reps":30,"icon":"🏃"},{"name":"Jump Rope","muscle":"Cardio","equipment":"Bodyweight","sets":3,"reps":3,"icon":"🏃"},{"name":"Core Circuit","muscle":"Core","equipment":"Bodyweight","sets":3,"reps":15,"icon":"🧱"}]},{"label":"Rest","rest":true,"exercises":[]}]',
+        TRUE
+      )
     `;
 
     return ok({ reset: true, message: 'All data wiped. Today + tomorrow will regenerate on next /api/state call.' });

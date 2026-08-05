@@ -82,6 +82,24 @@ function seedDemo() {
     { id: 3, type: 'Legs', name: 'Legs Day', exercises: [{ name: 'Squats', sets: 4, reps: 8 }, { name: 'Romanian Deadlift', sets: 4, reps: 10 }, { name: 'Leg Press', sets: 3, reps: 12 }, { name: 'Calf Raises', sets: 4, reps: 15 }], duration_min: 75 },
     { id: 4, type: 'Cardio', name: 'Cardio', exercises: [{ name: 'Run / Treadmill', sets: 1, reps: 30 }, { name: 'Core Circuit', sets: 3, reps: 15 }], duration_min: 45 },
   ];
+  const split = {
+    id: 1,
+    name: 'Classic PPL + Cardio',
+    is_active: true,
+    days: [
+      { label: 'Push', rest: false, exercises: plans[0].exercises.map((e) => ({ ...e, muscle: 'Chest', equipment: 'Barbell', icon: '🏋️' })) },
+      { label: 'Pull', rest: false, exercises: plans[1].exercises.map((e) => ({ ...e, muscle: 'Back', equipment: 'Barbell', icon: '🧗' })) },
+      { label: 'Rest', rest: true, exercises: [] },
+      { label: 'Legs', rest: false, exercises: plans[2].exercises.map((e) => ({ ...e, muscle: 'Quads', equipment: 'Barbell', icon: '🦵' })) },
+      { label: 'Cardio', rest: false, exercises: plans[3].exercises.map((e) => ({ ...e, muscle: 'Cardio', equipment: 'Bodyweight', icon: '🏃' })) },
+      { label: 'Rest', rest: true, exercises: [] },
+    ],
+  };
+  const prs = [
+    { id: 1, date: last2, exercise_name: 'Bench Press', weight: 80, reps: 8 },
+    { id: 2, date: last, exercise_name: 'Bench Press', weight: 82.5, reps: 8 },
+    { id: 3, date: last3, exercise_name: 'Deadlift', weight: 140, reps: 6 },
+  ];
   const habits = [
     { id: 1, name: 'Fajr on time', icon: '🌅', color: '#f59e0b', sort: 1 },
     { id: 2, name: 'Quran pages', icon: '📖', color: '#22c55e', sort: 2 },
@@ -112,6 +130,8 @@ function seedDemo() {
       { date: last2, habit_id: 3 },
       { date: last3, habit_id: 2 },
     ],
+    splits: [split],
+    prs,
   };
 }
 
@@ -221,6 +241,47 @@ const local = {
     writeLocal(s);
     return { date, habit_id: habitId, done: true };
   },
+  saveSplit(split) {
+    const s = local.state();
+    if (split.id) {
+      const i = s.splits.findIndex((x) => x.id === split.id);
+      if (i >= 0) s.splits[i] = { ...s.splits[i], ...split };
+    } else {
+      s.splits.push({ id: Date.now(), name: 'My Split', days: [], is_active: false, ...split });
+    }
+    if (split.is_active) s.splits = s.splits.map((x) => (x.id !== split.id ? { ...x, is_active: false } : x));
+    writeLocal(s);
+    return split;
+  },
+  deleteSplit(id) {
+    const s = local.state();
+    s.splits = s.splits.filter((x) => x.id !== id);
+    writeLocal(s);
+    return { id, deleted: true };
+  },
+  addPr(entry) {
+    const s = local.state();
+    const created = { id: Date.now(), date: todayStr(), weight: 0, reps: 1, ...entry };
+    s.prs = [created, ...s.prs].slice(0, 300);
+    writeLocal(s);
+    return created;
+  },
+  forecastSplit(n) {
+    const s = local.state();
+    const active = s.splits.find((x) => x.is_active) || s.splits[0];
+    const cycle = (active?.days || []).map((d) => ({ label: d.label, rest: !!d.rest }));
+    if (!cycle.length) return [];
+    const today = s.today;
+    const last = s.days.filter((d) => d.gym_type).sort((a, b) => b.date.localeCompare(a.date))[0];
+    let idx = cycle.findIndex((d) => d.label === last?.gym_type);
+    if (idx === -1) idx = 0;
+    const out = [];
+    for (let i = 1; i <= n; i++) {
+      idx = (idx + 1) % cycle.length;
+      out.push({ date: addDaysISO(today, i), label: cycle[idx].label, rest: cycle[idx].rest });
+    }
+    return out;
+  },
   reset() {
     const s = seedDemo();
     writeLocal(s);
@@ -329,5 +390,60 @@ export const api = {
       mode = 'local';
       return local.reset();
     }
+  },
+  async getSplits() {
+    if (mode === 'local') {
+      const s = local.state();
+      return { splits: s.splits, prs: s.prs, forecast: [] };
+    }
+    try {
+      return await serverRequest('splits');
+    } catch {
+      mode = 'local';
+      const s = local.state();
+      return { splits: s.splits, prs: s.prs, forecast: [] };
+    }
+  },
+  async saveSplit(split) {
+    if (mode === 'local') return local.saveSplit(split);
+    try {
+      const body = split.id ? { id: split.id, patch: split } : split;
+      return await serverRequest('splits', { method: split.id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+    } catch {
+      mode = 'local';
+      return local.saveSplit(split);
+    }
+  },
+  async deleteSplit(id) {
+    if (mode === 'local') return local.deleteSplit(id);
+    try {
+      return await serverRequest(`splits?id=${id}`, { method: 'DELETE', body: JSON.stringify({ id }) });
+    } catch {
+      mode = 'local';
+      return local.deleteSplit(id);
+    }
+  },
+  async addPr(entry) {
+    if (mode === 'local') return local.addPr(entry);
+    try {
+      return await serverRequest('splits', { method: 'POST', body: JSON.stringify({ action: 'pr', ...entry }) });
+    } catch {
+      mode = 'local';
+      return local.addPr(entry);
+    }
+  },
+  async forecastSplit(n) {
+    if (mode === 'local') return local.forecastSplit(n);
+    try {
+      return await serverRequest('splits', { method: 'POST', body: JSON.stringify({ action: 'forecast', days: n }) });
+    } catch {
+      mode = 'local';
+      return local.forecastSplit(n);
+    }
+  },
+  async fetchJson(url) {
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`fetch ${url} ${res.status}`);
+    return res.json();
   },
 };

@@ -56,12 +56,20 @@ export async function computeQuranStart(db) {
   return base >= QURAN_TOTAL ? 1 : base + 1;
 }
 
+export async function getActiveSplit(db) {
+  const rows = await db.sql`SELECT * FROM splits WHERE is_active ORDER BY updated_at DESC LIMIT 1`;
+  return rows[0] || null;
+}
+
 export async function computeGymType(db) {
+  const split = await getActiveSplit(db);
+  const cycle = (split?.days || []).map((d) => d.label);
+  if (!cycle.length) return GYM_ROTATION[0];
   const rows = await db.sql`SELECT gym_type FROM days WHERE gym_type IS NOT NULL ORDER BY date DESC LIMIT 1`;
   const last = rows[0]?.gym_type;
-  if (!last) return GYM_ROTATION[0];
-  const idx = GYM_ROTATION.indexOf(last);
-  return GYM_ROTATION[(idx + 1) % GYM_ROTATION.length];
+  if (!last) return cycle[0];
+  const idx = cycle.indexOf(last);
+  return cycle[(idx + 1) % cycle.length];
 }
 
 export function suggestedQuranEnd(start) {
@@ -90,6 +98,10 @@ export async function ensureDailyTasks(db, dateStr, day) {
     { title: `Quran — pages ${qStart}–${qEnd}`, start_time: day.maghrib, end_time: day.isha },
     { title: 'Sleep — wind down', start_time: day.sleep_time, end_time: addMinutes(day.sleep_time, 10) },
   ];
+  const gymType = day.gym_type;
+  if (gymType && gymType !== 'Rest') {
+    routine.push({ title: `Gym — ${gymType}`, project: 'Gym', start_time: '17:00', end_time: '18:30' });
+  }
   for (const t of routine) {
     if (!(await taskExists(db, dateStr, t.title))) {
       await insertTask(db, dateStr, t);
